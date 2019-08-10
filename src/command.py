@@ -25,6 +25,9 @@ def process():
     nproc = arguments.nproc
     binsave = not arguments.textsave
 
+    if not os.path.isdir('./outputs'):
+        os.mkdir('./outputs')
+
     if nproc == 1:
         run(infiles,L=L,B=B,J_min=J_min,maxscale=maxscale,nmaps=nmaps,binsave=binsave)
     if nproc > 1:
