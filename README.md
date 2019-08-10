@@ -12,5 +12,7 @@ The main dependencies are [`healpy`](https://healpy.readthedocs.io/), [`s2let`](
 ## Usage
 
 From the command line
+
 `tomos2n <input_files> <options>`
+
 `<input_files>` are 2D maps, saved as `.fits` files using the HEALPix pixelisation scheme.
