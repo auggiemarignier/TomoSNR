@@ -1,4 +1,4 @@
-from random_realisations import *
+from .random_realisations import *
 from argparse import ArgumentParser
 from mpi4py import MPI    
 import sys
