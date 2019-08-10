@@ -6,6 +6,7 @@ import sys, os, time
 from struct import *
 from contextlib import contextmanager
 from mpi4py import MPI
+from .__init__ import get_data
 
 @contextmanager
 def suppress_stdout():
@@ -125,7 +126,7 @@ class Stats:
         locs = [f'tile_{i:04d}' for i in range(1,1105)]
         for loc in locs:
             print(f'   {loc}',end='\r')
-            mask = hp.read_map(f'masks/{loc}.fits',verbose=False)
+            mask = hp.read_map(get_data(f'{loc}.fits'),verbose=False)
             maps_masked = hp.ma(self.maps)
             maps_masked.mask = mask
             loc_sd_map = maps_masked.std(axis=0)
