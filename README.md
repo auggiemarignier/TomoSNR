@@ -16,3 +16,5 @@ From the command line
 `tomos2n <input_files> <options>`
 
 `<input_files>` are 2D maps, saved as `.fits` files using the HEALPix pixelisation scheme.
+
+Output files are save in the `outputs` directory.  Note that rerunning the program will overwrite previous saved outputs files.
