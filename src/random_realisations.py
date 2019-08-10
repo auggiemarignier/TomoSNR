@@ -107,7 +107,7 @@ class Stats:
     def calc_s2n(self,map,error):
         return (map/error).mean()
 
-    def global_s2n(self,save_append):
+    def global_s2n(self,save_append=''):
         self.error_map()
         glob_s2n = np.asarray([self.calc_s2n(self.maps[i],self.error) for i in range(self.nmaps)])
         if self.binsave:
