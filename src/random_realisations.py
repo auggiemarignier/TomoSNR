@@ -171,9 +171,9 @@ def wavelet_decomp(f,params):
 
 
 
-def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
+def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,save_append=1):
     print(f'   READING INFILE...')
-    f,Nside = open_map(infile[0])
+    f,Nside = open_map(infile)
 
     print(f'   SETTING PARAMETERS...')
     params = Params(Nside,L,B,J_min,maxscale,nmaps,binsave)
@@ -187,10 +187,10 @@ def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
 
     print(f'   CALCULATING GLOBAL S2N...')
     stats = Stats(bunch,params)
-    stats.global_s2n()
+    stats.global_s2n(save_append)
 
     print(f'   CALCULATING LOCAL S2N...')
-    stats.local_s2n()
+    stats.local_s2n(save_append)
 
 def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
     nfiles = len(infiles)

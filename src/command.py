@@ -5,7 +5,7 @@ import sys
 
 def process():
     parser = ArgumentParser(description='Measure the S2N in your tomographic model by generating a bunch of random noise realisations.')
-    parser.add_argument('infiles',nargs='*',help='Input filenames.  Must be HealPix maps in .fits files.')
+    parser.add_argument('infiles',nargs='*',type=str,help='Input filenames.  Must be HealPix maps in .fits files.')
     parser.add_argument('-L',default=35,type=int,help='Maximum angular degree.  Positive integer.')
     parser.add_argument('-B',default=1.5,type=float,help='Wavelet parameter. Positive number > 1.')
     parser.add_argument('-J',default=2,type=int,help='Minimum wavelet scale in transform. Positive integer.')
@@ -28,8 +28,13 @@ def process():
     if not os.path.isdir('./outputs'):
         os.mkdir('./outputs')
 
+
+    print(len(infiles))
+
     if nproc == 1:
-        run(infiles,L=L,B=B,J_min=J_min,maxscale=maxscale,nmaps=nmaps,binsave=binsave)
+        for i,infile in enumerate(infiles,1):
+            print(i,infile)
+            run(infile,L=L,B=B,J_min=J_min,maxscale=maxscale,nmaps=nmaps,binsave=binsave)
     if nproc > 1:
         os.system(f"mpiexec -n {nproc} python random_realisations.py {' '.join(infiles)} {L} {B} {J_min} {maxscale} {nmaps} {binsave}")
 
