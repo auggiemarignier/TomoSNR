@@ -11,10 +11,14 @@ The main dependencies are [`healpy`](https://healpy.readthedocs.io/), [`s2let`](
 
 ## Usage
 
-From the command line
+From the command line, for the serial implementation
 
 `tomos2n <input_files> <options>`
 
+and for the parallel implementation
+
+`mpirun -np <nproc> tomos2n <input_riles> -P <options>`
+
 `<input_files>` are 2D maps, saved as `.fits` files using the HEALPix pixelisation scheme.
 
-Output files are save in the `outputs` directory.  Note that rerunning the program will overwrite previous saved outputs files. If no `outputs` directory exists in the directory where the program was called, one is created.
+Output files are save in the `outputs` directory.  If no `outputs` directory exists in the directory where the program was called, one is created.  Note that rerunning the program will overwrite previous saved outputs files.
