@@ -234,13 +234,3 @@ def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
 
     print(f'   Processor {rank+1} finished')
     sys.stdout.flush()
-
-if __name__=='__main__':
-    infiles = sys.argv[1:-6]
-    L = int(sys.argv[-6])
-    B = float(sys.argv[-5])
-    J_min = int(sys.argv[-4])
-    maxscale = int(sys.argv[-3])
-    nmaps = int(sys.argv[-2])
-    binsave = (sys.argv[-1]=='True')
-    run_par(infiles,L,B,J_min,maxscale,nmaps,binsave)
