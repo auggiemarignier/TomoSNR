@@ -201,7 +201,7 @@ def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
     for i in range(nfiles):
         if i%size != rank:
             continue
-        print(f'   Depth {i+1} being done by processor {rank+1} of {size}' )
+        print(f'   File {i+1} being done by processor {rank+1} of {size}' )
         sys.stdout.flush()
 
         print(f'      proc {rank+1}: READING INFILE...')
@@ -228,6 +228,12 @@ def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
         print(f'      proc {rank+1}: CALCULATING LOCAL S2N...')
         sys.stdout.flush()
         stats.local_s2n(save_append=f'{i+1}')
+
+        print(f'   File {i+1} done. Processor {rank+1} moving on...' )
+        sys.stdout.flush()
+
+    print(f'   Processor {rank+1} finished')
+    sys.stdout.flush()
 
 if __name__=='__main__':
     infiles = sys.argv[1:-6]

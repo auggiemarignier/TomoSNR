@@ -12,7 +12,7 @@ def process():
     parser.add_argument('-m','--maxscale',default=6,type=int,help='Maximum wavelet scale for which the original is kept.  All greater scales get simmulated. Positive integer.')
     parser.add_argument('-n','--nmaps',default=500,type=int,help='Number of random maps to be generated.  Positive integer.')
     parser.add_argument('-t','--textsave',action='store_true',help='With this flag, outputs are saved as text files rather than binaries.')
-    parser.add_argument('-N','--nproc',default=1,type=int,help='Number of processors for parallel operation.  Each processor works on a single input file. Positive Integer.')
+    parser.add_argument('-P','--parallel',action='store_true',help='Implements the parallel implementation.  Call using mpirun -np <nproc>')
 
     arguments = parser.parse_args()
 
@@ -22,21 +22,18 @@ def process():
     J_min = arguments.J
     maxscale = arguments.maxscale
     nmaps = arguments.nmaps
-    nproc = arguments.nproc
+    par = arguments.parallel
     binsave = not arguments.textsave
 
     if not os.path.isdir('./outputs'):
         os.mkdir('./outputs')
 
-
-    print(len(infiles))
-
-    if nproc == 1:
+    if not par:
         for i,infile in enumerate(infiles,1):
-            print(i,infile)
-            run(infile,L=L,B=B,J_min=J_min,maxscale=maxscale,nmaps=nmaps,binsave=binsave)
-    if nproc > 1:
-        os.system(f"mpiexec -n {nproc} python random_realisations.py {' '.join(infiles)} {L} {B} {J_min} {maxscale} {nmaps} {binsave}")
+            print(infile)
+            run(infile,L=L,B=B,J_min=J_min,maxscale=maxscale,nmaps=nmaps,binsave=binsave,save_append=i)
+    if par:
+        run_par(infiles,L=L,B=B,J_min=J_min,maxscale=maxscale,nmaps=nmaps,binsave=binsave)
 
 if __name__=='__main__':
     process()
