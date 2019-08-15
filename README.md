@@ -7,7 +7,7 @@ TomoS2N randomly simmulates noise in tomographic models and calculates a signal 
 Clone the repo and direct the command line to where you have the repo saved.  
 Type `python setup.py install`
 
-The main dependencies are [`healpy`](https://healpy.readthedocs.io/), [`s2let`](http://astro-informatics.github.io/s2let/), [`massmappy`](https://astro-informatics.github.io/massmappy/), and [`mpi4py`](https://mpi4py.readthedocs.io/).
+The main dependencies are [`healpy`](https://healpy.readthedocs.io/), [`s2let`](http://astro-informatics.github.io/s2let/) and [`mpi4py`](https://mpi4py.readthedocs.io/).
 
 ## Usage
 
