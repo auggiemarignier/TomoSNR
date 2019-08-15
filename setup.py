@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'TomoS2N',
-    version = '1.0',
+    version = '1.1',
     author = 'Auggie Marignier',
     author_email = 'augustin.marignier.14@ucl.ac.uk',
     packages = ['src'],

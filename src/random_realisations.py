@@ -21,7 +21,7 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 class Params:
-    def __init__(self,Nside=32,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
+    def __init__(self,Nside=32,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,par=True):
         '''     
         Inputs: Nside     = Healpix nside parameter
                 L         = maximum angular order
@@ -31,6 +31,7 @@ class Params:
                 nmaps     = number of desired random maps
                 nscales   = number of wavelet scales in decomposition
                 binsave   = if True, save S2N in binary files, if False save as             text
+                par       = True if running in parallel
         '''
         self.Nside = Nside
         self.L = L
@@ -41,6 +42,7 @@ class Params:
         J=pys2let.pys2let_j_max(B,L,J_min)
         self.nscales = J-J_min+1
         self.binsave = binsave
+        self.par = par
 
 class RandomMaps:
     def __init__(self,f,f_scal_lm,f_wav_lm,cl,params):
@@ -61,6 +63,7 @@ class RandomMaps:
         self.maxscale = params.maxscale
         self.nmaps = params.nmaps
         self.nscales = params.nscales
+        self.par = params.par
 
     def hp_lm2ind(self,el,em):
         return int(em*(2*self.L-1-em)/2+el)
@@ -105,7 +108,8 @@ class RandomMaps:
         random_maps = np.zeros((self.nmaps+1,hp.nside2npix(self.Nside)))
         for i in range(self.nmaps):
             random_maps[i] = self.make_random_map()
-            print(f'   {i}/{self.nmaps}',end='\r')
+            if not self.par:
+                print(f'   {i}/{self.nmaps}',end='\r')
         random_maps[self.nmaps] = self.f
         return random_maps
 
@@ -142,7 +146,8 @@ class Stats:
         '''
         locs = [f'tile_{i:04d}' for i in range(1,1105)]
         for loc in locs:
-            print(f'   {loc}',end='\r')
+            if not self.par:
+                print(f'   {loc}',end='\r')
             mask = hp.read_map(get_data(f'{loc}.fits'),verbose=False)
             maps_masked = hp.ma(self.maps)
             maps_masked.mask = mask
@@ -188,12 +193,12 @@ def wavelet_decomp(f,params):
 
 
 
-def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,save_append=1):
+def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,par=False,save_append=1):
     print(f'   READING INFILE...')
     f,Nside = open_map(infile)
 
     print(f'   SETTING PARAMETERS...')
-    params = Params(Nside,L,B,J_min,maxscale,nmaps,binsave)
+    params = Params(Nside,L,B,J_min,maxscale,nmaps,binsave,par)
 
     print(f'   WAVELET DECOMPOSITION...')
     f_scal_lm, f_wav_lm, cl = wavelet_decomp(f,params)
