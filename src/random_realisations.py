@@ -212,7 +212,6 @@ def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,save_append=
 def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
     nfiles = len(infiles)
     comm = MPI.COMM_WORLD
-    # comm = MPI.Comm.Get_parent()
     rank = comm.Get_rank()
     size = comm.Get_size()
     for i in range(nfiles):
