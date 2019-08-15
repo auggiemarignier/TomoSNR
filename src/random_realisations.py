@@ -1,7 +1,7 @@
 import numpy as np
 import healpy as hp
 import pys2let
-import cy_mass_mapping as mm
+# import cy_mass_mapping as mm
 import sys, os, time
 from struct import *
 from contextlib import contextmanager
@@ -63,14 +63,32 @@ class RandomMaps:
         self.nmaps = params.nmaps
         self.nscales = params.nscales
 
+    def hp_lm2ind(self,el,em):
+        return em*(2*self.L-1-em)/2+el
+
+    def generate_kappa_lm_hp(self,cl):
+        '''
+        Generates the lm of a random map (k) based on some power spectrum (cl)
+        '''
+        k_lm  = np.empty((L*(L+1)/2,), dtype=complex)
+        k_lm[self.hp_lm2ind(0, 0, self.L)] = 0.0
+        k_lm[self.hp_lm2ind(1, 0, self.L)] = 0.0
+        k_lm[self.hp_lm2ind(1, 1, self.L)] = 0.0
+        for el in range(2,self.L):
+            index = self.hp_lm2ind(el,0)
+            k_lm[index] = np.random.randn()*sqrt(cl[el])
+            for em in range(1,el+1):
+                index = self.hp_lm2ind(el,em)
+                k_lm[index] = (np.random.rand()+1j*np.random.randn())*sqrt(cl[el]*0.5)
+        return k_lm
+
     def gen_random_fields(self):
         '''
         Generates the lm of a random map (k) based on the power spectrum (cl) of the original scales to be simulated
         '''
         k_lm = np.zeros((self.L*(self.L+1)//2,self.nscales-self.maxscale),dtype=complex)
         for i,j in enumerate(range(self.maxscale,self.nscales)):
-            k_lm[:,i] = mm.generate_kappa_lm_hp(np.ascontiguousarray(self.cl[:,j]),self.L,-1)
-        k_lm *= np.sqrt(0.5)
+            k_lm[:,i] = generate_kappa_lm_hp(np.ascontiguousarray(self.cl[:,j]))
         self.klm = k_lm
 
     def make_random_map(self):
