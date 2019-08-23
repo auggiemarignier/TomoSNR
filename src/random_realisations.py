@@ -44,7 +44,7 @@ class Params:
         self.nscales = J-J_min+1
         self.binsave = binsave
         self.par = par
-        self.mask_dir = f'{tilesize}x{tilesize}'
+        self.tilesize = tilesize
 
 class RandomMaps:
     def __init__(self,f,f_scal_lm,f_wav_lm,cl,params):
@@ -124,7 +124,8 @@ class Stats:
         self.nmaps = params.nmaps+1
         self.str_format = f'{self.nmaps}d'
         self.binsave = params.binsave
-        self.mask_dir = params.mask_dir
+        self.tilesize = params.tilesize
+        self.par = params.par
 
     def error_map(self):
         self.error = (self.maps).std(axis=0)
@@ -147,12 +148,11 @@ class Stats:
         '''
         save_append = string to append to end of file name
         '''
-        print(len(os.listdir(get_data(self.mask_dir))))
-        locs = [f'tile_{i:04d}' for i in range(1,1105)]
+        locs = [f'{self.tilesize}_tile_{i:04d}' for i in range(1,1105)]
         for loc in locs:
             if not self.par:
                 print(f'   {loc}',end='\r')
-            mask = hp.read_map(get_data(f'{self.mask_dir}/{loc}.fits'),verbose=False)
+            mask = hp.read_map(get_data(f'{loc}.fits'),verbose=False)
             maps_masked = hp.ma(self.maps)
             maps_masked.mask = mask
             loc_sd_map = maps_masked.std(axis=0)
