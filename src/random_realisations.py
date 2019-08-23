@@ -148,7 +148,8 @@ class Stats:
         '''
         save_append = string to append to end of file name
         '''
-        locs = [f'{self.tilesize}_tile_{i:04d}' for i in range(1,1105)]
+        ntiles = len([name for name in os.listdir(get_data('')) if name.split('_')[0]==str(self.tilesize)])
+        locs = [f'{self.tilesize}_tile_{i:04d}' for i in range(1,ntiles+1)]
         for loc in locs:
             if not self.par:
                 print(f'   {loc}',end='\r')
@@ -218,7 +219,7 @@ def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True,p
     print(f'   CALCULATING LOCAL S2N...')
     stats.local_s2n(save_append)
 
-def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesiz=8,binsave=True):
+def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True):
     nfiles = len(infiles)
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
