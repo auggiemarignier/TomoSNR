@@ -11,7 +11,7 @@ def process():
     parser.add_argument('-J',default=2,type=int,help='Minimum wavelet scale in transform. Positive integer.')
     parser.add_argument('-m','--maxscale',default=6,type=int,help='Maximum wavelet scale for which the original is kept.  All greater scales get simmulated. Positive integer.')
     parser.add_argument('-n','--nmaps',default=500,type=int,help='Number of random maps to be generated.  Positive integer.')
-    parser.add_argument('-t','--tilesize',default=8,type=int,help='Defines the size of tile as ARGxARG degrees.  Even positive integer.')
+    parser.add_argument('-t','--tilesize',default=8,type=int,help='Defines the size of tile as ARGxARG degrees.  Current accepted values are 8,14,42 and 42.')
     parser.add_argument('--textsave',action='store_true',help='With this flag, outputs are saved as text files rather than binaries.')
     parser.add_argument('-P','--parallel',action='store_true',help='Implements the parallel implementation.  Call using mpirun -np <nproc>')
 
