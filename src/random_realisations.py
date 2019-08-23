@@ -21,7 +21,7 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 class Params:
-    def __init__(self,Nside=32,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,par=True):
+    def __init__(self,Nside=32,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True,par=True):
         '''     
         Inputs: Nside     = Healpix nside parameter
                 L         = maximum angular order
@@ -29,6 +29,7 @@ class Params:
                 J_min     = minimum wavelet scale
                 maxscale  = maximum scale for which the original is kept
                 nmaps     = number of desired random maps
+                tilesize  = number of degrees in lat long for mask
                 nscales   = number of wavelet scales in decomposition
                 binsave   = if True, save S2N in binary files, if False save as             text
                 par       = True if running in parallel
@@ -43,6 +44,7 @@ class Params:
         self.nscales = J-J_min+1
         self.binsave = binsave
         self.par = par
+        self.mask_dir = f'{tilesize}x{tilesize}'
 
 class RandomMaps:
     def __init__(self,f,f_scal_lm,f_wav_lm,cl,params):
@@ -122,6 +124,7 @@ class Stats:
         self.nmaps = params.nmaps+1
         self.str_format = f'{self.nmaps}d'
         self.binsave = params.binsave
+        self.mask_dir = params.mask_dir
 
     def error_map(self):
         self.error = (self.maps).std(axis=0)
@@ -144,11 +147,12 @@ class Stats:
         '''
         save_append = string to append to end of file name
         '''
+        print(len(os.listdir(get_data(self.mask_dir))))
         locs = [f'tile_{i:04d}' for i in range(1,1105)]
         for loc in locs:
             if not self.par:
                 print(f'   {loc}',end='\r')
-            mask = hp.read_map(get_data(f'{loc}.fits'),verbose=False)
+            mask = hp.read_map(get_data(f'{self.mask_dir}/{loc}.fits'),verbose=False)
             maps_masked = hp.ma(self.maps)
             maps_masked.mask = mask
             loc_sd_map = maps_masked.std(axis=0)
@@ -193,12 +197,12 @@ def wavelet_decomp(f,params):
 
 
 
-def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,par=False,save_append=1):
+def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True,par=False,save_append=1):
     print(f'   READING INFILE...')
     f,Nside = open_map(infile)
 
     print(f'   SETTING PARAMETERS...')
-    params = Params(Nside,L,B,J_min,maxscale,nmaps,binsave,par)
+    params = Params(Nside,L,B,J_min,maxscale,nmaps,tilesize,binsave,par)
 
     print(f'   WAVELET DECOMPOSITION...')
     f_scal_lm, f_wav_lm, cl = wavelet_decomp(f,params)
@@ -214,7 +218,7 @@ def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True,par=False,sa
     print(f'   CALCULATING LOCAL S2N...')
     stats.local_s2n(save_append)
 
-def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
+def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesiz=8,binsave=True):
     nfiles = len(infiles)
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -230,7 +234,7 @@ def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,binsave=True):
         infile = infiles[i]
         f,Nside = open_map(infile)
 
-        params = Params(Nside,L,B,J_min,maxscale,nmaps,binsave)
+        params = Params(Nside,L,B,J_min,maxscale,nmaps,tilesize,binsave)
 
         print(f'      proc {rank+1}: WAVELET DECOMPOSITION...')
         sys.stdout.flush()
