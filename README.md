@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3594850.svg)](https://doi.org/10.5281/zenodo.3594850)
+
+
 # TomoS2N
 
 TomoS2N randomly simmulates noise in tomographic models and calculates a signal to noise ratio. This is done by taking the spherical wavelet transform of the model, and simulating random versions of the small scale information.
