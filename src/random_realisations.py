@@ -21,13 +21,13 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 class Params:
-    def __init__(self,Nside=32,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True,par=True):
+    def __init__(self,Nside=32,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=True,par=True):
         '''     
         Inputs: Nside     = Healpix nside parameter
                 L         = maximum angular order
                 B         = wavelet parameter
                 J_min     = minimum wavelet scale
-                maxscale  = maximum scale for which the original is kept
+                simscales = list of scales to simulate - scale 0 is the scaling function
                 nmaps     = number of desired random maps
                 tilesize  = number of degrees in lat long for mask
                 nscales   = number of wavelet scales in decomposition
@@ -38,7 +38,7 @@ class Params:
         self.L = L
         self.B = B
         self.J_min = J_min
-        self.maxscale = maxscale
+        self.simscales = simscales
         self.nmaps = nmaps
         J=pys2let.pys2let_j_max(B,L,J_min)
         self.nscales = J-J_min+1
@@ -62,7 +62,7 @@ class RandomMaps:
         self.L = params.L
         self.B = params.B
         self.J_min = params.J_min
-        self.maxscale = params.maxscale
+        self.simscales = params.simscales
         self.nmaps = params.nmaps
         self.nscales = params.nscales
         self.par = params.par
@@ -90,17 +90,19 @@ class RandomMaps:
         '''
         Generates the lm of a random map (k) based on the power spectrum (cl) of the original scales to be simulated
         '''
-        k_lm = np.zeros((self.L*(self.L+1)//2,self.nscales-self.maxscale),dtype=complex)
-        for i,j in enumerate(range(self.maxscale,self.nscales)):
+        k_lm = np.zeros((self.L*(self.L+1)//2,len(self.simscales)),dtype=complex)
+        for i,j in enumerate(self.simscales):
             k_lm[:,i] = self.generate_kappa_lm_hp(np.ascontiguousarray(self.cl[:,j]))
-        self.klm = k_lm
+        return k_lm
 
     def make_random_map(self):
         '''
         Makes a random map
         '''
-        self.gen_random_fields()
-        rand_wav_lm = np.concatenate([self.f_wav_lm[:,0:self.maxscale],self.klm],axis=1)
+        k_lm = self.gen_random_fields()
+        rand_wav_lm = np.copy(self.f_wav_lm)
+        for i,s in enumerate(self.simscales):
+            rand_wav_lm[:,s] = k_lm[:,i]
         frand_lm = pys2let.synthesis_axisym_lm_wav(rand_wav_lm,self.f_scal_lm,self.B,self.L,self.J_min)
         with suppress_stdout():
             frand = hp.alm2map(frand_lm,nside=self.Nside,lmax=self.L-1)
@@ -183,14 +185,14 @@ def wavelet_decomp(f,params):
     L = params.L
     B = params.B
     J_min = params.J_min
-    maxscale = params.maxscale
+    simscales = params.simscales
     nscales = params.nscales
     with suppress_stdout():
         flm = hp.map2alm(f,lmax=L-1)
     f_wav_lm, f_scal_lm = pys2let.analysis_axisym_lm_wav(flm,B,L,J_min)
     f_wav = np.zeros([hp.nside2npix(Nside), nscales])
     cl = np.zeros([L,nscales])
-    for j in range(maxscale,nscales):
+    for j in simscales:
         with suppress_stdout():
             f_wav[:,j] = hp.alm2map(f_wav_lm[:,j].ravel(),nside=Nside,lmax=L-1)
             cl[:,j] = hp.anafast(f_wav[:,j],lmax=L-1)
@@ -198,12 +200,12 @@ def wavelet_decomp(f,params):
 
 
 
-def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True,par=False,save_append=1):
+def run(infile,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=True,par=False,save_append=1):
     print(f'   READING INFILE...')
     f,Nside = open_map(infile)
 
     print(f'   SETTING PARAMETERS...')
-    params = Params(Nside,L,B,J_min,maxscale,nmaps,tilesize,binsave,par)
+    params = Params(Nside,L,B,J_min,simscales,nmaps,tilesize,binsave,par)
 
     print(f'   WAVELET DECOMPOSITION...')
     f_scal_lm, f_wav_lm, cl = wavelet_decomp(f,params)
@@ -219,7 +221,7 @@ def run(infile,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True,p
     print(f'   CALCULATING LOCAL S2N...')
     stats.local_s2n(save_append)
 
-def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=True):
+def run_par(infiles,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=True):
     nfiles = len(infiles)
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -235,7 +237,7 @@ def run_par(infiles,L=35,B=1.5,J_min=2,maxscale=6,nmaps=500,tilesize=8,binsave=T
         infile = infiles[i]
         f,Nside = open_map(infile)
 
-        params = Params(Nside,L,B,J_min,maxscale,nmaps,tilesize,binsave)
+        params = Params(Nside,L,B,J_min,simscales,nmaps,tilesize,binsave)
 
         print(f'      proc {rank+1}: WAVELET DECOMPOSITION...')
         sys.stdout.flush()
