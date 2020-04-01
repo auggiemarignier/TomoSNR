@@ -121,8 +121,9 @@ class Stats:
     '''
     Functions for summary statistics and S2N on maps
     '''
-    def __init__(self,random_maps,params):
+    def __init__(self,random_maps,save_summary_maps,params):
         self.maps = random_maps
+        self.save_summary_maps = save_summary_maps
         self.nmaps = params.nmaps+1
         self.str_format = f'{self.nmaps}d'
         self.binsave = params.binsave
@@ -132,11 +133,20 @@ class Stats:
     def error_map(self):
         self.error = (self.maps).std(axis=0)
 
+    def mean_map(self):
+        self.mean = (self.maps).mean(axis=0)
+
+    def build_summary_maps(self,save_append=''):
+        self.error_map()
+        self.mean_map()
+        if self.save_summary_maps:
+            hp.write_map(f'outputs/error_{save_append}.fits',self.error)
+            hp.write_map(f'outputs/mean_{save_append}.fits',self.mean)
+
     def calc_s2n(self,map,error):
         return (map/error).mean()
 
     def global_s2n(self,save_append=''):
-        self.error_map()
         glob_s2n = np.asarray([self.calc_s2n(self.maps[i],self.error) for i in range(self.nmaps)])
         if self.binsave:
             packed = pack(self.str_format,*glob_s2n)
@@ -200,7 +210,7 @@ def wavelet_decomp(f,params):
 
 
 
-def run(infile,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=True,par=False,save_append=1):
+def run(infile,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=True,par=False,save_append=1,save_summary_maps=True):
     print(f'   READING INFILE...')
     f,Nside = open_map(infile)
 
@@ -215,13 +225,14 @@ def run(infile,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=Tr
     bunch = maps.make_bunch_of_maps()
 
     print(f'   CALCULATING GLOBAL S2N...')
-    stats = Stats(bunch,params)
+    stats = Stats(bunch,save_summary_maps,params)
+    stats.build_summary_maps(save_append)
     stats.global_s2n(save_append)
 
     print(f'   CALCULATING LOCAL S2N...')
     stats.local_s2n(save_append)
 
-def run_par(infiles,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=True):
+def run_par(infiles,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsave=True,save_summary_maps=True):
     nfiles = len(infiles)
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -250,7 +261,8 @@ def run_par(infiles,L=35,B=1.5,J_min=2,simscales=[-1],nmaps=500,tilesize=8,binsa
 
         print(f'      proc {rank+1}: CALCULATING GLOBAL S2N...')
         sys.stdout.flush()
-        stats = Stats(bunch,params)
+        stats = Stats(bunch,save_summary_maps,params)
+        stats.build_summary_maps(save_append=f'{i+1}')
         s2n = stats.global_s2n(save_append=f'{i+1}')
 
         print(f'      proc {rank+1}: CALCULATING LOCAL S2N...')
