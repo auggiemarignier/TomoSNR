@@ -34,5 +34,5 @@ def xyz2hp(xyzfile, Nside, outfile=None):
     hpmap = pixelise(vals, Nside, longs, lats)
 
     if outfile is None:
-        outfile = os.path.basename(xyzfile).split(".")[0] + ".fits"
-    hp.write_map(outfile, hpmap, overwrite=True)
+        outfile = os.path.basename(xyzfile).split(".")[0]
+    hp.write_map(f"{outfile}.fits", hpmap, overwrite=True)
