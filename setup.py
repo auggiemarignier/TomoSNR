@@ -1,11 +1,12 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+
 
 setup(
-    name="TomoSNR",
-    version="1.2",
+    name="tomosnr",
+    version="1.2.1",
     author="Auggie Marignier",
     author_email="augustin.marignier.14@ucl.ac.uk",
-    packages=["src"],
-    package_data={"src": ["masks/*"]},
-    entry_points={"console_scripts": ["tomosnr = src.main:process"]},
+    packages=find_packages(),
+    package_data={"tomosnr": ["tiles/*"]},
+    entry_points={"console_scripts": ["tomosnr = tomosnr.main:process"]},
 )

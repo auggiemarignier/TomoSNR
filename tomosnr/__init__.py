@@ -4,4 +4,4 @@ _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_data(path):
-    return os.path.join(_ROOT, "masks", path)
+    return os.path.join(_ROOT, "tiles", path)
