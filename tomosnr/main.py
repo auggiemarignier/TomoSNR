@@ -58,6 +58,11 @@ def process():
         action="store_true",
         help="Implements the parallel implementation.  Call using mpirun -np <nproc>",
     )
+    parser.add_argument(
+        "--locsonly",
+        action="store_true",
+        help="Only runs for specific locations, not the tiled Earth",
+    )
 
     arguments = parser.parse_args()
 
@@ -70,6 +75,7 @@ def process():
     par = arguments.parallel
     binsave = not arguments.textsave
     tilesize = arguments.tilesize
+    locsonly = arguments.locsonly
 
     if not os.path.isdir("./outputs"):
         os.mkdir("./outputs")
@@ -87,6 +93,7 @@ def process():
                 tilesize=tilesize,
                 binsave=binsave,
                 save_append=i,
+                locsonly=locsonly,
             )
     if par:
         run_par(
@@ -98,6 +105,7 @@ def process():
             nmaps=nmaps,
             tilesize=tilesize,
             binsave=binsave,
+            locsonly=locsonly,
         )
 
 

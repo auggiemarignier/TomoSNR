@@ -35,6 +35,7 @@ class Params:
         tilesize=8,
         binsave=True,
         par=True,
+        locsonly=False,
     ):
         """
         Inputs: Nside     = Healpix nside parameter
@@ -46,6 +47,7 @@ class Params:
                 tilesize  = number of degrees in lat long for mask
                 binsave   = if True, save S2N in binary files, if False save as text
                 par       = True if running in parallel
+                locsonly  = True if running for only specific locations and not tiles
         """
         self.Nside = Nside
         self.L = L
@@ -58,6 +60,7 @@ class Params:
         self.binsave = binsave
         self.par = par
         self.tilesize = tilesize
+        self.locsonly = locsonly
 
 
 class RandomMaps:
@@ -80,6 +83,7 @@ class RandomMaps:
         self.nmaps = params.nmaps
         self.nscales = params.nscales
         self.par = params.par
+        self.locsonly = params.locsonly
 
     def hp_lm2ind(self, el, em):
         return int(em * (2 * self.L - 1 - em) / 2 + el)
@@ -151,6 +155,7 @@ class Stats:
         self.binsave = params.binsave
         self.tilesize = params.tilesize
         self.par = params.par
+        self.locsonly = params.locsonly
 
     def error_map(self):
         self.error = (self.maps).std(axis=0)
@@ -183,14 +188,40 @@ class Stats:
         """
         save_append = string to append to end of file name
         """
-        ntiles = len(
-            [
-                name
-                for name in os.listdir(get_data(""))
-                if name.split("_")[0] == str(self.tilesize)
+        if not self.locsonly:
+            ntiles = len(
+                [
+                    name
+                    for name in os.listdir(get_data(""))
+                    if name.split("_")[0] == str(self.tilesize)
+                ]
+            )
+            locs = [f"{self.tilesize}_tile_{i:04d}" for i in range(1, ntiles + 1)]
+        else:
+            locs = [
+                "afar",
+                "australia",
+                "brazilcoast",
+                "canaries",
+                "capeverde",
+                "comoros",
+                "eastpacificrise",
+                "everest",
+                "greenland",
+                "hawaii",
+                "iceland",
+                "macdonald",
+                "marquesas",
+                "midatalanticridge",
+                "namibia",
+                "pitcairn",
+                "richardsdeep",
+                "russia",
+                "samoa",
+                "southernocean",
+                "tahiti",
+                "yellowstone",
             ]
-        )
-        locs = [f"{self.tilesize}_tile_{i:04d}" for i in range(1, ntiles + 1)]
         for loc in locs:
             if not self.par:
                 print(f"   {loc}", end="\r")
@@ -256,12 +287,15 @@ def run(
     binsave=True,
     par=False,
     save_append=1,
+    locsonly=False,
 ):
     print(f"   READING INFILE...")
     f, Nside = open_map(infile)
 
     print(f"   SETTING PARAMETERS...")
-    params = Params(Nside, L, B, J_min, simscales, nmaps, tilesize, binsave, par)
+    params = Params(
+        Nside, L, B, J_min, simscales, nmaps, tilesize, binsave, par, locsonly=locsonly
+    )
 
     print(f"   WAVELET DECOMPOSITION...")
     f_scal_lm, f_wav_lm, cl = wavelet_decomp(f, params)
@@ -291,6 +325,7 @@ def run_par(
     tilesize=8,
     binsave=True,
     save_summary_maps=True,
+    locsonly=False,
 ):
     nfiles = len(infiles)
     comm = MPI.COMM_WORLD
@@ -307,7 +342,9 @@ def run_par(
         infile = infiles[i]
         f, Nside = open_map(infile)
 
-        params = Params(Nside, L, B, J_min, simscales, nmaps, tilesize, binsave)
+        params = Params(
+            Nside, L, B, J_min, simscales, nmaps, tilesize, binsave, locsonly=locsonly
+        )
 
         print(f"      proc {rank+1}: WAVELET DECOMPOSITION...")
         sys.stdout.flush()
