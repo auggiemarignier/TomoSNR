@@ -31,7 +31,7 @@ def process():
         nargs="+",
         default=-1,
         type=int,
-        help="List of wavelet scales to be simulated, indexed from 0. Integer.",
+        help="List of wavelet scales to be simulated, where index 0 is the scaling function. Can use negative indexes.  List of integers.",
     )
     parser.add_argument(
         "-n",

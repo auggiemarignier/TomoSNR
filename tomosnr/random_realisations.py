@@ -44,7 +44,6 @@ class Params:
                 simscales = list of scales to simulate - scale 0 is the scaling function
                 nmaps     = number of desired random maps
                 tilesize  = number of degrees in lat long for mask
-                nscales   = number of wavelet scales in decomposition
                 binsave   = if True, save S2N in binary files, if False save as text
                 par       = True if running in parallel
         """
