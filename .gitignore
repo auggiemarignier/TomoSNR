@@ -1,2 +1,6 @@
 __pycache__
 *.egg-info
+.vscode
+example/data/snr
+example/data/sglobe/fits
+*.ipynb_checkpoints

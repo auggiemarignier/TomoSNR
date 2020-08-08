@@ -1,0 +1,222 @@
+elsewheres:
+  australia:
+    lat: -24
+    long: 130
+  brazilcoast:
+    lat: -5
+    long: -35
+  eastpacificrise:
+    lat: -10
+    long: -110
+  everest:
+    lat: 28
+    long: 87
+  greenland:
+    lat: 71
+    long: -42
+  midatalanticridge:
+    lat: 20
+    long: -45
+  namibia:
+    lat: -27
+    long: 16
+  russia:
+    lat: 60
+    long: 60
+  richardsdeep:
+    lat: -23
+    long: -71
+  southernocean:
+    lat: -65
+    long: -100
+  yellowstone:
+    lat: 44
+    long: -110
+
+
+plumes:
+  canaries:
+    lat: 28
+    long: -20
+  capeverde:
+    lat: 14
+    long: -20
+  comoros:
+    lat: -12
+    long: 43
+  afar:
+    lat: 6
+    long: 34
+  hawaii:
+    lat: 20
+    long: -156
+  iceland:
+    lat: 65
+    long: -20
+  macdonald:
+    lat: -30
+    long: -140
+  marquesas:
+    lat: -10
+    long: -138
+  pitcairn:
+    lat: -26
+    long: -130
+  samoa:
+    lat: -14
+    long: -170
+  tahiti:
+    lat: -18
+    long: -150
+
+hotspots:
+  Afar:
+    lat: 10
+    long: 43
+  Ascension:
+    lat: -8
+    long: -14
+  Azores: 
+    lat: 39
+    long: -28
+  Baja:
+    lat: 27
+    long: -113
+  Balleny:
+    lat: -67
+    long: 163
+  Bermuda:
+    lat: 33
+    long: -67
+  Bouvet:
+    lat: -54
+    long: 2
+  Bowie:
+    lat: 53
+    long: -135
+  Cameroon: 
+    lat: 4
+    long: 9
+  Canaries:
+    lat: 28
+    long: -20
+  Cape Verde:
+    lat: 14
+    long: -20
+  Caroline:
+    lat: 5
+    long: 164
+  Comoros:
+    lat: -12
+    long: 43
+  Crozet:
+    lat: -45
+    long: 50
+  Darfur:
+    lat: 13
+    long: 24
+  Discovery:
+    lat: -42
+    long: 0
+  East Africa:
+    lat: 6
+    long: 34
+  East Australia:
+    lat: -38
+    long: 143
+  Easter:
+    lat: -27
+    long: -110
+  Eifel:
+    lat: 50
+    long: 7
+  Fernando: 
+    lat: -4
+    long: -32
+  Galapagos:
+    lat: 0
+    long: -92
+  Great Meteor:
+    lat: 28
+    long: -32
+  Hawaii:
+    lat: 20
+    long: -156
+  Hoggar:
+    lat: 23
+    long: 6
+  Iceland:
+    lat: 65
+    long: -20
+  Jan Mayen:
+    lat: 71
+    long: -8
+  Juan de Fuca:
+    lat: 46
+    long: -130
+  Juan Fernandez:
+    lat: -34
+    long: -83
+  Kerguelen:
+    lat: -49
+    long: 69
+  Louisville:
+    lat: -51
+    long: -141
+  Lord Howe:
+    lat: -33
+    long: 159
+  Macdonald:
+    lat: -30
+    long: -140
+  Marion:
+    lat: -47
+    long: 38
+  Marquesas:
+    lat: -10
+    long: -138
+  Martin:
+    lat: -20
+    long: -29
+  Meteor:
+    lat: -52
+    long: 1
+  Pitcairn:
+    lat: -26
+    long: -130
+  Raton:
+    lat: 37
+    long: -104
+  Reunion:
+    lat: -21
+    long: 56
+  St Helena:
+    lat: -17
+    long: -20
+  Samoa:
+    lat: -14
+    long: -170
+  Sanfelix:
+    lat: -26
+    long: -80
+  Socorro:
+    lat: 19
+    long: -111
+  Tahiti:
+    lat: -18
+    long: -150
+  Tasmanid:
+    lat: -39
+    long: 156
+  Tibesti:
+    lat: 21
+    long: 17
+  Tristan:
+    lat: -37
+    long: -12
+  Vema:
+    lat: -33
+    long: 4
+  Yellowstone:
+    lat: 44
+    long: -111
