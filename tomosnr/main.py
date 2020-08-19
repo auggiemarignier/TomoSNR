@@ -77,8 +77,10 @@ def process():
     tilesize = arguments.tilesize
     locsonly = arguments.locsonly
 
-    if not os.path.isdir("./outputs"):
+    try:
         os.mkdir("./outputs")
+    except FileExistsError:
+        pass
 
     if not par:
         for i, infile in enumerate(infiles, 1):
