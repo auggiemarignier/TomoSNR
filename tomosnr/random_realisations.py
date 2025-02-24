@@ -5,7 +5,7 @@ import sys
 import os
 from struct import pack
 from contextlib import contextmanager
-from mpi4py import MPI
+from joblib import Parallel, delayed
 from .__init__ import get_data
 
 
@@ -286,37 +286,38 @@ def run(
     tilesize=8,
     binsave=True,
     par=False,
-    save_append=1,
+    save_append="",
     locsonly=False,
 ):
-    print(f"   READING INFILE...")
+    print("   READING INFILE...")
     f, Nside = open_map(infile)
 
-    print(f"   SETTING PARAMETERS...")
+    print("   SETTING PARAMETERS...")
     params = Params(
         Nside, L, B, J_min, simscales, nmaps, tilesize, binsave, par, locsonly=locsonly
     )
 
-    print(f"   WAVELET DECOMPOSITION...")
+    print("   WAVELET DECOMPOSITION...")
     f_scal_lm, f_wav_lm, cl = wavelet_decomp(f, params)
 
-    print(f"   MAKING RANDOM MAPS...")
+    print("   MAKING RANDOM MAPS...")
     maps = RandomMaps(f, f_scal_lm, f_wav_lm, cl, params)
     bunch = maps.make_bunch_of_maps()
 
-    print(f"   BUILDING SUMMARY MAPS...")
+    print("   BUILDING SUMMARY MAPS...")
     stats = Stats(bunch, params)
     stats.build_summary_maps(save_append)
 
-    print(f"   CALCULATING GLOBAL S2N...")
+    print("   CALCULATING GLOBAL S2N...")
     stats.global_s2n(save_append)
 
-    print(f"   CALCULATING LOCAL S2N...")
+    print("   CALCULATING LOCAL S2N...")
     stats.local_s2n(save_append)
 
 
 def run_par(
     infiles,
+    nproc=4,
     L=35,
     B=1.5,
     J_min=2,
@@ -328,48 +329,19 @@ def run_par(
     locsonly=False,
 ):
     nfiles = len(infiles)
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    for i in range(nfiles):
-        if i % size != rank:
-            continue
-        print(f"   File {i+1} being done by processor {rank+1} of {size}")
-        sys.stdout.flush()
-
-        print(f"      proc {rank+1}: READING INFILE...")
-        sys.stdout.flush()
-        infile = infiles[i]
-        f, Nside = open_map(infile)
-
-        params = Params(
-            Nside, L, B, J_min, simscales, nmaps, tilesize, binsave, locsonly=locsonly
+    Parallel(n_jobs=nproc)(
+        delayed(run)(
+            infiles[i],
+            L=L,
+            B=B,
+            J_min=J_min,
+            simscales=simscales,
+            nmaps=nmaps,
+            tilesize=tilesize,
+            binsave=binsave,
+            par=True,
+            save_append=i + 1,
+            locsonly=locsonly,
         )
-
-        print(f"      proc {rank+1}: WAVELET DECOMPOSITION...")
-        sys.stdout.flush()
-        f_scal_lm, f_wav_lm, cl = wavelet_decomp(f, params)
-
-        print(f"      proc {rank+1}: MAKING RANDOM MAPS...")
-        sys.stdout.flush()
-        maps = RandomMaps(f, f_scal_lm, f_wav_lm, cl, params)
-        bunch = maps.make_bunch_of_maps()
-
-        print(f"      proc {rank+1}: BUILDING SUMMARY MAPS...")
-        sys.stdout.flush()
-        stats = Stats(bunch, params)
-        stats.build_summary_maps(save_append=f"{i+1}")
-
-        print(f"      proc {rank+1}: CALCULATING GLOBAL S2N...")
-        sys.stdout.flush()
-        stats.global_s2n(save_append=f"{i+1}")
-
-        print(f"      proc {rank+1}: CALCULATING LOCAL S2N...")
-        sys.stdout.flush()
-        stats.local_s2n(save_append=f"{i+1}")
-
-        print(f"   File {i+1} done. Processor {rank+1} moving on...")
-        sys.stdout.flush()
-
-    print(f"   Processor {rank+1} finished")
-    sys.stdout.flush()
+        for i in range(nfiles)
+    )

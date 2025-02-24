@@ -55,8 +55,8 @@ def process():
     parser.add_argument(
         "-P",
         "--parallel",
-        action="store_true",
-        help="Implements the parallel implementation.  Call using mpirun -np <nproc>",
+        default=4,
+        help="If set to 0, runs in serial. If set to an integer, runs in parallel with that many cores.",
     )
     parser.add_argument(
         "--locsonly",
@@ -72,7 +72,8 @@ def process():
     J_min = arguments.J
     simscales = arguments.simscales
     nmaps = arguments.nmaps
-    par = arguments.parallel
+    # If parallel is set to 1, it will run in serial
+    par = 0 if arguments.parallel == 1 else arguments.parallel
     binsave = not arguments.textsave
     tilesize = arguments.tilesize
     locsonly = arguments.locsonly
@@ -94,12 +95,13 @@ def process():
                 nmaps=nmaps,
                 tilesize=tilesize,
                 binsave=binsave,
-                save_append=i,
+                save_append=str(i),
                 locsonly=locsonly,
             )
     if par:
         run_par(
             infiles,
+            nproc=par,
             L=L,
             B=B,
             J_min=J_min,
