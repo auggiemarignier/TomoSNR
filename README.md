@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3976749.svg)](https://doi.org/10.5281/zenodo.3976749)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14920090.svg)](https://doi.org/10.5281/zenodo.14920090)
 ![Python](https://img.shields.io/badge/python-3.8-blue)
 
 # TomoSNR
