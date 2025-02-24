@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "tomosnr"
+version = "1.3.0"
+description = "Add your description here"
+authors = [
+    { name = "Auggie Marignier", email = "augustin.marigneir@anu.edu.au" },
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["healpy>=1.16.5", "mpi4py>=4.0.3", "pys2let>=2.2.6"]
+
+
+[project.scripts]
+tomosnr = "tomosnr.main:process"
+
+[project.optional-dependencies]
+example = [
+    "jupyter>=1.1.1",
+    "seaborn>=0.13.2",
+]
+
+[tool.setuptools.package-data]
+tomosnr = ["tiles/*"]
